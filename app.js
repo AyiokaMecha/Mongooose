@@ -4,7 +4,7 @@ import bodyParser from "body-parser";
 import ejs from "ejs";
 import mongoose from "mongoose";
 import { stringify } from "querystring";
-
+import encrypt from "mongoose-encryption";
 const app = express();
 
 app.use(express.static("public"));
@@ -14,10 +14,18 @@ app.use(bodyParser.urlencoded({ extended: true }));
 mongoose.connect("mongodb:localhost:27017/userDB", { useNewUrlParser: true });
 
 //defining a schema for the user object to be fed into the database
-const userSchema = {
+const userSchema = new mongoose.Schema({
   email: String,
   password: String,
-};
+});
+//a long string to be used for encryption
+const secret = "ajlkjaljdfkjalkdjflakdflkajdlkjflajslfdjalsdjkfasf";
+
+userSchema.plugin(encrypt,{secret:secret,encryptedFields:['password']})
+
+
+
+
 
 const User = new mongoose.model("User", userSchema);
 app.get("/", (req, res) => {
